@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: hollandali
+      POSTGRES_USER: hollandali
+      POSTGRES_PASSWORD: hollandali
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  strapi:
+    image: node:22-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run develop"
+    volumes:
+      - ./cms:/app
+    environment:
+      HOST: 0.0.0.0
+      PORT: 1337
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: hollandali
+      DATABASE_USERNAME: hollandali
+      DATABASE_PASSWORD: hollandali
+      DATABASE_SSL: "false"
+      APP_KEYS: change-me-1,change-me-2
+      API_TOKEN_SALT: change-me-token
+      ADMIN_JWT_SECRET: change-me-admin
+      TRANSFER_TOKEN_SALT: change-me-transfer
+      JWT_SECRET: change-me-jwt
+    depends_on:
+      - postgres
+    ports:
+      - "1337:1337"
+
+volumes:
+  postgres_data:
